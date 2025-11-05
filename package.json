@@ -1,0 +1,51 @@
+{
+  "name": "demo-app",
+  "version": "1.0.0",
+  "description": "A CLI tool built with TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "demo-app": "./bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "cli",
+    "typescript",
+    "tool"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.23",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/demo-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/demo-app/issues"
+  },
+  "homepage": "https://github.com/yourusername/demo-app#readme",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "reflect-metadata": "^0.2.2",
+    "ts-morph": "^27.0.2",
+    "yup": "^1.7.1"
+  }
+}

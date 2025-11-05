@@ -1,0 +1,37 @@
+# Source files (only distribute compiled code)
+src/
+tsconfig.json
+
+# Tests
+*.test.ts
+*.spec.ts
+__tests__/
+coverage/
+
+# Development files
+.vscode/
+.idea/
+.editorconfig
+.eslintrc*
+.prettierrc*
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+.travis.yml
+.circleci/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# Other
+.DS_Store
+*.tmp
+node_modules/

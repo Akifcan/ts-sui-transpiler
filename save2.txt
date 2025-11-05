@@ -1,0 +1,32 @@
+INSTALLATION
+brew install sui
+
+GET OWNED OBJECTS 
+sui client objects WALLET_ADDRESS
+
+GET ACTIVE ADDRESS
+sui client active-address 
+
+GET AVAILABLE ADDRESSES
+sui client addresses 
+
+CHANGE AN ALIAS
+sui keytool update-alias OLD_ALIAS_NAME NEW_ALIAS_NAME 
+
+SWITCH TO ANOTHER ADDRESS
+sui client switch --address <ADDRESS>
+
+GET THE ACTIVE ENV
+sui client active-env
+
+PUBLISH A CONTRACT
+sui client publish  
+
+MAKE A FUNCTION CALL
+sui client call --package ADDRESS --module MODULE_NAME --function FUNCTION_NAME  
+sui client call --package ADDRESS --module MODULE_NAME --function FUNCTION_NAME --args ARG_1 
+sui client call --package ADDRESS --module MODULE_NAME --function FUNCTION_NAME --args ARG_1 ARG_2 ARG_3 (NO COMMA NEEDED)
+
+BUILD A PACKAGE
+sui move build 
+
