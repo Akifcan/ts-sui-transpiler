@@ -229,3 +229,142 @@ class Greeting {
 
 export default Greeting
 ```
+
+### Understanding the Concepts
+
+#### Decorators
+
+Decorators are special annotations that provide metadata about your code and control how it's transpiled to Move.
+
+##### `@Module(name: string)`
+- **Purpose:** Defines the Move module name
+- **Usage:** Applied to the class declaration
+- **Example:** `@Module('hello_world')` generates `module hello_world::greeting`
+- **Note:** The class name is automatically converted to lowercase for the package name
+
+##### `@Write(structName: string)`
+- **Purpose:** Marks a method as a constructor function that creates and shares a new object
+- **Usage:** Applied to methods that should create new on-chain objects
+- **Example:** `@Write('User')` generates a function that:
+  - Creates a new User struct instance
+  - Initializes it with provided parameters
+  - Shares it on-chain using `transfer::share_object`
+- **Generated Move code includes:**
+  - Automatic `ctx: &mut TxContext` parameter
+  - `object::new(ctx)` for unique ID generation
+  - `transfer::share_object()` call
+
+#### The `exec` Template Literal
+
+The `exec` template literal is used to write Move logic directly within TypeScript methods.
+
+```typescript
+exec`counterItem.value = counterItem.value + 1;`
+```
+
+- **Purpose:** Embeds Move code directly in your TypeScript
+- **Usage:** For methods that modify existing objects
+- **Features:**
+  - Preserves Move syntax within the template literal
+  - Supports all Move operations and expressions
+  - Automatically handles parameter type conversion
+
+#### Type System
+
+##### `Mut<T>`
+- **Purpose:** Indicates a mutable reference to a struct
+- **Usage:** Used in method parameters for objects that will be modified
+- **Example:** `Mut<'Counter'>` transpiles to `&mut Counter` in Move
+- **Important:** The generic parameter must match an existing struct name
+
+##### `sui` Type Mappings
+The `sui` object provides TypeScript representations of Move primitive types:
+
+| TypeScript | Move Type | Description |
+|------------|-----------|-------------|
+| `sui.STRING` | `string::String` | UTF-8 string type |
+| `sui.bool` | `bool` | Boolean value |
+| `sui.SMALL` | `u8` | 8-bit unsigned integer (0-255) |
+| `sui.large` | `u32` | 32-bit unsigned integer |
+| `sui.UID` | `UID` | Unique identifier for objects |
+
+#### Class Structure
+
+##### Properties (Structs)
+Class properties define Move structs:
+
+```typescript
+User = {
+    name: sui.STRING,
+    status: sui.bool,
+    age: sui.SMALL
+}
+```
+
+Generates:
+```move
+public struct User has key, store {
+    id: UID,
+    name: string::String,
+    status: bool,
+    age: u8
+}
+```
+
+**Key points:**
+- Each struct automatically gets an `id: UID` field
+- All structs have `key, store` abilities by default
+- Property names and types are preserved
+
+##### Methods
+
+Methods are transpiled based on their decorators:
+
+1. **Write Methods** (with `@Write` decorator):
+   - Create new objects
+   - Automatically add transaction context parameter
+   - Share objects on-chain
+
+2. **Regular Methods** (no decorator):
+   - Modify existing objects
+   - Accept mutable references
+   - Contain business logic via `exec` template literals
+
+#### Transpilation Process
+
+1. **Parse:** TypeScript AST is analyzed to extract:
+   - Class decorators for module info
+   - Properties for struct definitions
+   - Methods and their decorators
+
+2. **Transform:**
+   - Structs are converted to Move struct definitions
+   - Write methods become constructor functions
+   - Regular methods become public functions with Move logic
+
+3. **Generate:**
+   - Formatted Move code with proper indentation
+   - Syntax highlighting in terminal output
+   - Complete module structure
+
+#### Best Practices
+
+1. **Naming Conventions:**
+   - Use PascalCase for struct names (e.g., `User`, `Counter`)
+   - Use snake_case for method names (e.g., `create_user`, `increment_counter`)
+   - Module names should be lowercase with underscores
+
+2. **Method Design:**
+   - Keep Write methods simple (just creation logic)
+   - Use regular methods for complex business logic
+   - Group related functionality in the same class
+
+3. **Type Safety:**
+   - Always use the `sui` type mappings for consistency
+   - Use `Mut<T>` for parameters that will be modified
+   - Ensure struct names in `Mut<T>` match defined properties
+
+4. **Code Organization:**
+   - One module per `.sui.ts` file
+   - Export the class as default
+   - Keep imports at the top of the file
