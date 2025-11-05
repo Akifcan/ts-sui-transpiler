@@ -2,7 +2,6 @@ import * as yup from "yup";
 import chalk from "chalk";
 import { filePathSchema } from "../schemas/file-path.schema";
 import { formatMoveCode, getSourceFile, parseObjectString } from "../utils";
-import { paramSui, sui } from "../types";
 import { handleStructs } from "../utils/structs";
 import { handleWriteMethods } from "../utils/write-methods";
 import { handleExecMethods } from "../utils/exec-methods";
