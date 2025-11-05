@@ -5,6 +5,7 @@ import { formatMoveCode, getSourceFile, parseObjectString } from "../utils";
 import { paramSui, sui } from "../types";
 import { handleStructs } from "../utils/structs";
 import { handleWriteMethods } from "../utils/write-methods";
+import { handleExecMethods } from "../utils/exec-methods";
 
 export async function compile(filePath: string): Promise<void> {
   try {
@@ -22,12 +23,14 @@ export async function compile(filePath: string): Promise<void> {
       classesJSON[0].methods,
       writeValues
     );
+    const EXEC_METHODS = handleExecMethods(classesJSON[0].methods.filter(x => x.decorators.length === 0))
 
     // Build the complete Move module
     const moveModule = `module ${moduleName}::${packageName} {
   use std::string::{Self, String};
   ${STRUCTS}
   ${WRITE_METHODS}
+  ${EXEC_METHODS}
 }`;
     const formattedCode = formatMoveCode(moveModule);
 

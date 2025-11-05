@@ -116,3 +116,5 @@ export function formatMoveCode(code: string): string {
 
   return formattedLines.join('\n');
 }
+
+export function exec(strings: TemplateStringsArray, ...values: any[]) {}

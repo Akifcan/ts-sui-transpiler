@@ -14,3 +14,5 @@ export const paramSui = {
     large: 'u32',
     bool: 'bool'
 }
+
+export interface Mut<T> {}

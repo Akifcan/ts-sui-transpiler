@@ -1,5 +1,6 @@
 import { Module, Write } from "./decorators";
-import { sui } from "./types";
+import { Mut, sui } from "./types";
+import { exec } from "./utils";
 
 @Module('hello_world')
 class Greeting {
@@ -23,6 +24,14 @@ class Greeting {
 
     @Write('Admin')
     create_admin(){}
+
+    incrementCounter(counterItem: Mut<'Counter'>){
+        exec`counterItem.value = counterItem.value + 1;`
+    }
+
+    multiplyCounter(counterItem: Mut<'Counter'>){
+        exec`counterItem.value = counterItem.value * 2;`
+    }
 }
 
 export default Greeting
