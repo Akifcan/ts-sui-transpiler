@@ -89,3 +89,30 @@ export function getSourceFile(filePath: string) {
 
   return classesJSON;
 }
+
+export function formatMoveCode(code: string): string {
+  const lines = code.split('\n');
+  let indentLevel = 0;
+  const formattedLines: string[] = [];
+
+  for (let line of lines) {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) continue; // Skip empty lines
+
+    // Decrease indent for closing braces
+    if (trimmedLine === '}' || trimmedLine.startsWith('}')) {
+      indentLevel = Math.max(0, indentLevel - 1);
+    }
+
+    // Add proper indentation
+    const indentedLine = '  '.repeat(indentLevel) + trimmedLine;
+    formattedLines.push(indentedLine);
+
+    // Increase indent after opening braces
+    if (trimmedLine.endsWith('{')) {
+      indentLevel++;
+    }
+  }
+
+  return formattedLines.join('\n');
+}

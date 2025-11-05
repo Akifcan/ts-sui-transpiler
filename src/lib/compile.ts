@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import chalk from "chalk";
 import { filePathSchema } from "../schemas/file-path.schema";
-import { getSourceFile, parseObjectString } from "../utils";
+import { formatMoveCode, getSourceFile, parseObjectString } from "../utils";
 import { paramSui, sui } from "../types";
 
 export async function compile(filePath: string): Promise<void> {
@@ -29,49 +29,74 @@ export async function compile(filePath: string): Promise<void> {
             })
             .join(", ") + `, ctx: &mut TxContext`;
 
-        const objArgs = keys.map((key) => {
-          return key
-        }).join(',')
-        
-        writeValues[x.name] = {functionArgs, objArgs: `id: object::new(ctx),${objArgs}`};
+        const objArgs = keys
+          .map((key) => {
+            return key;
+          })
+          .join(",");
 
-        return `
-            public struct ${x.name} has key, store {
-              id: UID,
-              ${keys
-                .map((key, index) => {
-                  const type = obj[key].split(".")[1];
-                  return `\t${key}: ${(sui as any)[type]}${
-                    keys.length - 1 !== index ? "," : ""
-                  }`;
-                })
-                .join("\n")}
-            }
-        `;
+        writeValues[x.name] = {
+          functionArgs,
+          objArgs: `id: object::new(ctx),${objArgs}`,
+        };
+
+        // Format struct with proper indentation
+        return `public struct ${x.name} has key, store {
+  id: UID,${keys
+    .map((key) => {
+      const type = obj[key].split(".")[1];
+      return `\n  ${key}: ${(sui as any)[type]}`;
+    })
+    .join(",")}
+}`;
       })
-      .join("\n");
+      .join("\n\n");
 
     const writeMethods = classesJSON[0].methods.filter((x) =>
       x.decorators.find((y) => y.name === "Write")
     );
-    const WRITE_METHODS = writeMethods.map((method) => {
-      const struct = method.decorators[0].arguments[0].replace(/'/g, "");
-      const variable = struct.toLowerCase()
-      return `public fun ${method.name}(${writeValues[struct].functionArgs}) {
-                let ${variable} = ${struct} {${writeValues[struct].objArgs}};
-                transfer::share_object(${variable});
-          }`
-    }).join('\n');
+    const WRITE_METHODS = writeMethods
+      .map((method) => {
+        const struct = method.decorators[0].arguments[0].replace(/'/g, "");
+        const variable = struct.toLowerCase();
+        return `public fun ${method.name}(${writeValues[struct].functionArgs}) {
+  let ${variable} = ${struct} {${writeValues[struct].objArgs}};
+  transfer::share_object(${variable});
+}`;
+      })
+      .join("\n\n");
 
-    console.log(`
-      
-      module ${moduleName}::${packageName} {
-          use std::string::{Self, String};
-          ${STRUCTS}
-          ${WRITE_METHODS}
-        }
-    `)
+    // Build the complete Move module
+    const moveModule = `module ${moduleName}::${packageName} {
+  use std::string::{Self, String};
 
+  ${STRUCTS}
+
+  ${WRITE_METHODS}
+}`;
+    const formattedCode = formatMoveCode(moveModule);
+
+    console.log(chalk.cyan("\n" + "=".repeat(60)));
+    console.log(chalk.cyan.bold("Generated Move Code:"));
+    console.log(chalk.cyan("=".repeat(60) + "\n"));
+
+    const highlightedCode = formattedCode
+      .split("\n")
+      .map((line) => {
+        // Highlight keywords
+        return line
+          .replace(
+            /\b(module|use|public|struct|fun|let|has|key|store)\b/g,
+            chalk.blue("$1")
+          )
+          .replace(/\b(Self|String|UID)\b/g, chalk.yellow("$1"))
+          .replace(/(::|->)/g, chalk.gray("$1"))
+          .replace(/(\/\/.*$)/gm, chalk.green("$1")); // Comments
+      })
+      .join("\n");
+
+    console.log(highlightedCode);
+    console.log(chalk.cyan("\n" + "=".repeat(60) + "\n"));
   } catch (error) {
     if (error instanceof yup.ValidationError) {
       console.log(chalk.red.bold(`Error: ${error.message}`));
