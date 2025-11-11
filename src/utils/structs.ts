@@ -1,5 +1,5 @@
-import { parseObjectString } from ".";
-import { paramSui, sui } from "../types";
+import { parseObjectString, parseStringArray } from ".";
+import { HasProps, paramSui, sui } from "../types";
 
 export const handleStructs = (properties: any) => {
   const writeValues: any = {};
@@ -7,6 +7,18 @@ export const handleStructs = (properties: any) => {
     .map((x: any) => {
       const obj = parseObjectString(x.defaultValue!);
       const keys = Object.keys(obj);
+
+      let hasProps: HasProps[] = ["key", "store"];
+
+      const selectedHas = x.decorators.filter(
+        (decorator: any) => decorator.name === "Has"
+      );
+      selectedHas.forEach((c: any) => {
+        const parsedArray = parseStringArray(c.arguments[0]);
+        hasProps = parsedArray as HasProps[];
+      });
+
+      const hasSet = [...new Set(hasProps)]
 
       const functionArgs =
         keys
@@ -27,9 +39,14 @@ export const handleStructs = (properties: any) => {
         objArgs: `id: object::new(ctx),${objArgs}`,
       };
 
+      const idField = hasSet.find((x) =>
+        x === 'key'
+      )? "id: UID," : "";
+
+
       // Format struct with proper indentation
-      return `public struct ${x.name} has key, store {
-      id: UID,${keys
+      return `public struct ${x.name} has ${hasSet.join(",")} {
+       ${idField} ${keys
         .map((key) => {
           const type = obj[key].split(".")[1];
           return `\n  ${key}: ${(sui as any)[type]}`;
@@ -39,8 +56,8 @@ export const handleStructs = (properties: any) => {
     })
     .join("\n\n");
 
-    return {
-        writeValues,
-        STRUCTS: structs
-    }
+  return {
+    writeValues,
+    STRUCTS: structs,
+  };
 };

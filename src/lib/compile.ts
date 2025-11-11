@@ -16,8 +16,13 @@ export async function compile(filePath: string): Promise<void> {
       ""
     );
     const packageName = classesJSON[0].name?.toLowerCase();
+    
+    
 
     const { STRUCTS, writeValues } = handleStructs(classesJSON[0].properties);
+
+    console.log(STRUCTS)
+    return
     const WRITE_METHODS = handleWriteMethods(
       classesJSON[0].methods,
       writeValues

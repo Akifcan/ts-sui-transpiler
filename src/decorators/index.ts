@@ -1,4 +1,13 @@
 import 'reflect-metadata';
+import { HasProps } from '../types';
+
+
+function Has(has: HasProps[]) {
+    return function(target: any) {
+        Reflect.defineMetadata('module:module', { has }, target);
+        return target;
+    }
+}
 
 function Module(key: string) {
     return function(target: any) {
@@ -14,7 +23,17 @@ function Write(key: string) {
     }
 }
 
+
+function Mint(key: string) {
+    return function(target: any) {
+        Reflect.defineMetadata('module:write', { key }, target);
+        return target;
+    }
+}
+
 export {
+    Has,
     Module,
     Write,
+    Mint
 }

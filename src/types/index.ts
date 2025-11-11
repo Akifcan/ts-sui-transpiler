@@ -15,4 +15,6 @@ export const paramSui = {
     bool: 'bool'
 }
 
+export type HasProps = 'key'|'store'|'drop'|'copy'
+
 export interface Mut<T> {}

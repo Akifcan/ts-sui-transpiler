@@ -117,4 +117,47 @@ export function formatMoveCode(code: string): string {
   return formattedLines.join('\n');
 }
 
+export function parseStringArray(arrayString: string): string[] {
+  // Check if the input is already an array
+  if (Array.isArray(arrayString)) {
+    return arrayString;
+  }
+
+  // If it's not a string, return empty array
+  if (typeof arrayString !== 'string') {
+    return [];
+  }
+
+  // Remove leading/trailing whitespace
+  const trimmed = arrayString.trim();
+
+  // Check if it looks like an array
+  if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) {
+    return [];
+  }
+
+  try {
+    // Remove the brackets
+    const content = trimmed.slice(1, -1);
+
+    // If empty array
+    if (!content.trim()) {
+      return [];
+    }
+
+    // Split by comma and clean each element
+    const parsedArray = content.split(',').map(item => {
+      // Trim whitespace
+      const cleaned = item.trim();
+      // Remove surrounding quotes (single or double)
+      return cleaned.replace(/^['"]|['"]$/g, '');
+    });
+
+    return parsedArray;
+  } catch (error) {
+    console.error('Error parsing string array:', error);
+    return [];
+  }
+}
+
 export function exec(strings: TemplateStringsArray, ...values: any[]) {}
