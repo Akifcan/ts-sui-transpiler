@@ -20,6 +20,11 @@ export const handleStructs = (properties: any) => {
 
       const hasSet = [...new Set(hasProps)]
 
+      // Validate incompatible HasProps combinations
+      if (hasSet.includes('key') && (hasSet.includes('drop') || hasSet.includes('copy'))) {
+        throw new Error("The type 'sui::object::UID' does not have the ability 'copy' | 'drop'");
+      }
+
       const functionArgs =
         keys
           .map((key) => {

@@ -22,7 +22,6 @@ class Greeting {
         value: sui.large
     }
 
-
     @Has(['store', 'drop', 'copy'])
     Task = {
         topic: sui.STRING,
