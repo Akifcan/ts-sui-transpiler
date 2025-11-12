@@ -2,25 +2,42 @@ import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const TEMPLATE_CONTENT = `import { Module, Write } from "./decorators";
-import { Mut, sui } from "./types";
+const TEMPLATE_CONTENT = `import { Balance, Has, Mint, Module, Push, Vector, Write } from "./decorators";
+import { BalanceFor, Mut, sui } from "./types";
 import { exec } from "./utils";
 
 @Module('hello_world')
 class Greeting {
 
+    @Balance()
+    MyWorks: BalanceFor = ['deposit', 'withdraw', 'get_balance']
+
+    @Balance()
+    MyFunds: BalanceFor = ['deposit', 'withdraw']
+
+    @Has(['key', 'store'])
     User = {
-        name: sui.STRING,
+        name: sui.string,
         status: sui.bool,
-        age: sui.SMALL
+        age: sui.u8
     }
 
+    @Has(['key', 'store'])
     Admin = {
         status: sui.bool
     }
 
+    @Has(['key', 'store'])
     Counter = {
-        value: sui.large
+        value: sui.u32
+    }
+
+    @Has(['key', 'store'])
+    @Vector()
+    Project = {
+        name: sui.string,
+        description: sui.string,
+        webSiteUrl: sui.string
     }
 
     @Write('User')
@@ -28,6 +45,13 @@ class Greeting {
 
     @Write('Admin')
     create_admin(){}
+
+
+    @Push('Project')
+    create_project(){}
+
+    @Mint('Admin')
+    mint_hero(){}
 
     incrementCounter(counterItem: Mut<'Counter'>){
         exec\`counterItem.value = counterItem.value + 1;\`

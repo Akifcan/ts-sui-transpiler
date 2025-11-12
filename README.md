@@ -1,5 +1,7 @@
 # Demo App - TypeScript to Move Transpiler
 
+## Features
+
 ## Purpose
 
 This is a TypeScript-to-Move transpiler that allows developers to write Sui smart contracts using familiar JavaScript syntax.
