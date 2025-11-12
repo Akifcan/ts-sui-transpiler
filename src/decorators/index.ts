@@ -46,7 +46,16 @@ function Mint(key: string) {
     }
 }
 
+
+function Balance() {
+    return function(target: any) {
+        Reflect.defineMetadata('module:balance', { }, target);
+        return target;
+    }
+}
+
 export {
+    Balance,
     Has,
     Module,
     Write,

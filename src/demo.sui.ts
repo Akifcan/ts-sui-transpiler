@@ -1,9 +1,15 @@
-import { Has, Mint, Module, Push, Vector, Write } from "./decorators";
-import { Mut, sui } from "./types";
+import { Balance, Has, Mint, Module, Push, Vector, Write } from "./decorators";
+import { BalanceFor, Mut, sui } from "./types";
 import { exec } from "./utils";
 
 @Module('hello_world')
 class Greeting {
+
+    @Balance()
+    MyWorks: BalanceFor = ['deposit', 'withdraw', 'get_balance']
+
+    @Balance()
+    MyFunds: BalanceFor = ['deposit', 'withdraw']
 
     @Has(['key', 'store'])
     User = {

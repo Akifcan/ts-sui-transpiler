@@ -6,6 +6,7 @@ import { handleStructs } from "../utils/structs";
 import { handleWriteMethods } from "../utils/write-methods";
 import { handleExecMethods } from "../utils/exec-methods";
 import { handleVectorMethods } from "../utils/vector-methods";
+import { handleContractBalance } from "../utils/contract-balance";
 
 export async function compile(filePath: string): Promise<void> {
   try {
@@ -18,7 +19,7 @@ export async function compile(filePath: string): Promise<void> {
     );
     const packageName = classesJSON[0].name?.toLowerCase();
     
-    
+    const BALANCES = handleContractBalance(classesJSON[0].properties)
 
     const { 
       STRUCTS, 
@@ -52,6 +53,12 @@ export async function compile(filePath: string): Promise<void> {
 
   // CUSTOM METHODS
   ${EXEC_METHODS}
+
+  // ----------------------
+  // Balance Struct&Functions
+  ${BALANCES}
+  // ----------------------
+  // Balance Struct&Functions
 }`;
     const formattedCode = formatMoveCode(moveModule);
 

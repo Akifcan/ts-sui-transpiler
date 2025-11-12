@@ -7,6 +7,9 @@ export const sui = {
     address: 'address'
 }
 
+type BalanceMethods = 'deposit'|'withdraw'|'get_balance'
+export type BalanceFor = BalanceMethods[]
+
 export type HasProps = 'key'|'store'|'drop'|'copy'
 
 export interface Mut<T> {}
