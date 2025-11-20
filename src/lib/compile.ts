@@ -7,6 +7,7 @@ import { handleWriteMethods } from "../utils/write-methods";
 import { handleExecMethods } from "../utils/exec-methods";
 import { handleVectorMethods } from "../utils/vector-methods";
 import { handleContractBalance } from "../utils/contract-balance";
+import { handleNftMethods } from "../utils/nft-methods";
 
 export async function compile(filePath: string): Promise<void> {
   try {
@@ -33,13 +34,15 @@ export async function compile(filePath: string): Promise<void> {
       classesJSON[0].methods,
       writeValues
     );
+    
     const VECTOR_METHODS = handleVectorMethods(classesJSON[0].methods, vectorValues)
+    const NFT_METHODS = handleNftMethods(classesJSON[0].methods, writeValues)
     const EXEC_METHODS = handleExecMethods(classesJSON[0].methods.filter(x => x.decorators.length === 0))
-
+    
     // Build the complete Move module
     const moveModule = `module ${moduleName}::${packageName} {
   
-  // USE
+  // === Imports ===
   ${USE}
   ${BALANCES && `
     use sui::balance;
@@ -47,23 +50,24 @@ export async function compile(filePath: string): Promise<void> {
     use sui::sui::SUI;
 `}
 
-  // STRUCTS
+  // === Errors ===
+
+  // === Structs ===
   ${STRUCTS}
 
-  // WRITE METHODS
+  // === Public Functions ===
   ${WRITE_METHODS}
 
-  // VECTOR METHODS
   ${VECTOR_METHODS}
 
-  // CUSTOM METHODS
   ${EXEC_METHODS}
 
-  // ----------------------
-  // Balance Struct&Functions
+  // === NFT Functions ===
+
+  ${NFT_METHODS}
+
+  // === Balance Functions ===
   ${BALANCES}
-  // ----------------------
-  // Balance Struct&Functions
 }`;
     const formattedCode = formatMoveCode(moveModule);
 

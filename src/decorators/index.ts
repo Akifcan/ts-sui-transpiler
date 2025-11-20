@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { HasProps } from '../types';
+import { HasProps, TransferType } from '../types';
 
 
 function Has(has: HasProps[]) {
@@ -16,32 +16,32 @@ function Vector() {
     }
 }
 
-function Module(key: string) {
+function Module(struct: string) {
     return function(target: any) {
-        Reflect.defineMetadata('module:module', { key }, target);
+        Reflect.defineMetadata('module:module', { struct }, target);
         return target;
     }
 }
 
-function Write(key: string) {
+function Write(struct: string) {
     return function(target: any) {
-        Reflect.defineMetadata('module:write', { key }, target);
-        return target;
-    }
-}
-
-
-function Push(key: string) {
-    return function(target: any) {
-        Reflect.defineMetadata('module:push', { key }, target);
+        Reflect.defineMetadata('module:write', { struct }, target);
         return target;
     }
 }
 
 
-function Mint(key: string) {
+function Push(struct: string) {
     return function(target: any) {
-        Reflect.defineMetadata('module:min', { key }, target);
+        Reflect.defineMetadata('module:push', { struct }, target);
+        return target;
+    }
+}
+
+
+function Mint(struct: string) {
+    return function(target: any) {
+        Reflect.defineMetadata('module:mint', { struct }, target);
         return target;
     }
 }
@@ -54,6 +54,13 @@ function Balance() {
     }
 }
 
+function Transfer(transferType: TransferType[]){
+    return function(target: any) {
+        Reflect.defineMetadata('module:transfer', { }, target);
+        return target;
+    }
+}
+
 export {
     Balance,
     Has,
@@ -61,5 +68,6 @@ export {
     Write,
     Mint,
     Vector,
-    Push
+    Push,
+    Transfer
 }

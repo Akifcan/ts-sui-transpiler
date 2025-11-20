@@ -1,5 +1,10 @@
 export const handleVectorMethods = (methods: any, vectorValues: any) => {
 
+
+    if(Object.keys(vectorValues).length === 0){
+        return ''
+    }
+
     const vectorMethods = methods.filter((x: any) =>
         x.decorators.find((y: any) => y.name === "Push")
       );

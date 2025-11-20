@@ -13,3 +13,5 @@ export type BalanceFor = BalanceMethods[]
 export type HasProps = 'key'|'store'|'drop'|'copy'
 
 export interface Mut<T> {}
+
+export type TransferType = 'me' | 'receiver' 
