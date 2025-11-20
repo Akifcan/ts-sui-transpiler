@@ -39,9 +39,9 @@ function Push(struct: string) {
 }
 
 
-function Mint(struct: string) {
+function Mint(struct: string, opt?: {display?: boolean}) {
     return function(target: any) {
-        Reflect.defineMetadata('module:mint', { struct }, target);
+        Reflect.defineMetadata('module:mint', { struct, opt }, target);
         return target;
     }
 }

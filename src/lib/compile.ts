@@ -28,7 +28,6 @@ export async function compile(filePath: string): Promise<void> {
       vectorValues,
       writeValues,
     } = handleStructs(classesJSON[0].properties);
-
     
     const WRITE_METHODS = handleWriteMethods(
       classesJSON[0].methods,
@@ -36,9 +35,17 @@ export async function compile(filePath: string): Promise<void> {
     );
     
     const VECTOR_METHODS = handleVectorMethods(classesJSON[0].methods, vectorValues)
+    
     const {NFT_METHODS, USE: NFT_USES, INIT: NFT_INITS} = handleNftMethods(classesJSON[0].methods, writeValues)
+
     const EXEC_METHODS = handleExecMethods(classesJSON[0].methods.filter(x => x.decorators.length === 0))
 
+    const INITS = NFT_INITS ? `
+      fun init(otw: ${packageName?.toUpperCase()}, ctx: &mut TxContext) {
+         let publisher = package::claim(otw, ctx);
+        ${NFT_INITS}
+      }
+    ` : ''
     // Build the complete Move module
     const moveModule = `module ${moduleName}::${packageName} {
   
@@ -52,10 +59,7 @@ export async function compile(filePath: string): Promise<void> {
   // === Structs ===
   ${STRUCTS}
   // === Init ===
-  fun init(otw: ${packageName?.toUpperCase()}, ctx: &mut TxContext) {
-    let publisher = package::claim(otw, ctx);
-    ${NFT_INITS}
-  }
+  ${INITS}
   // === Public Functions ===
   ${WRITE_METHODS}
   ${VECTOR_METHODS}
