@@ -4,14 +4,21 @@ export const handleExecMethods = (methods: any) => {
         const params = x.parameters.map((y: any) => {
             let type = ''
             if(y.type.startsWith('Mut')){
-                type = `&mut ${y.type.match(/<(?:")?([^">]+)(?:")?>/)[1]}` 
+                type = `&mut ${y.type.match(/<(?:")?([^">]+)(?:")?>/)[1]}`
             }else {
                 type = y.type.match(/<(?:")?([^">]+)(?:")?>/)[1]
             }
             return `${y.name}: ${type}`
         }).join(',')
-        return `public fun ${x.name}(${params}) {
-            ${functionBody[1]}
-        }`
+
+        // Split statements by semicolon and join with newlines
+        const bodyContent = functionBody[1]
+            .split(';')
+            .map((stmt: string) => stmt.trim())
+            .filter((stmt: string) => stmt.length > 0)
+            .map((stmt: string) => `    ${stmt};`)
+            .join('\n')
+
+        return `public fun ${x.name}(${params}) {\n${bodyContent}\n  }`
     }).join('\n')
 }
