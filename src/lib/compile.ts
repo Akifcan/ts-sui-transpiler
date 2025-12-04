@@ -8,6 +8,7 @@ import { handleExecMethods } from "../utils/exec-methods";
 import { handleVectorMethods } from "../utils/vector-methods";
 import { handleContractBalance } from "../utils/contract-balance";
 import { handleNftMethods } from "../utils/nft-methods";
+import { handleAssert } from "../utils/assert";
 
 export async function compile(filePath: string): Promise<void> {
   try {
@@ -22,6 +23,8 @@ export async function compile(filePath: string): Promise<void> {
     
     const {BALANCE_METHODS, USE: BALANCE_USES} = handleContractBalance(classesJSON[0].properties)
 
+    const ASSERTS = handleAssert(classesJSON[0].methods)
+
     const { 
       STRUCTS, 
       USE: STRUCT_USES,
@@ -29,11 +32,11 @@ export async function compile(filePath: string): Promise<void> {
       writeValues,
     } = handleStructs(classesJSON[0].properties);
     
-    const WRITE_METHODS = handleWriteMethods(
+    const {WRITE_METHODS} = handleWriteMethods(
       classesJSON[0].methods,
       writeValues
     );
-    
+    return
     const VECTOR_METHODS = handleVectorMethods(classesJSON[0].methods, vectorValues)
     
     const {NFT_METHODS, USE: NFT_USES, INIT: NFT_INITS} = handleNftMethods(classesJSON[0].methods, writeValues)

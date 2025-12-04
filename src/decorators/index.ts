@@ -9,16 +9,9 @@ function Has(has: HasProps[]) {
     }
 }
 
-function OnlyFor(address: string) {
+function Assert(assertion: {must: string, code: number}[]) {
     return function(target: any) {
-        Reflect.defineMetadata('module:onlyFor', { address }, target);
-        return target;
-    }
-}
-
-function Assert(condition: string, errorCode: number) {
-    return function(target: any) {
-        Reflect.defineMetadata('module:assert', { condition, errorCode }, target);
+        Reflect.defineMetadata('module:assert', { assertion }, target);
         return target;
     }
 }
@@ -85,5 +78,4 @@ export {
     Push,
     Transfer,
     Assert,
-    OnlyFor
 }

@@ -1,9 +1,6 @@
-import { Assert, Has, Module, OnlyFor, Write } from "./decorators";
+import { Assert, Has, Module, Write } from "./decorators";
+import { Assertion } from "./lib/assertion";
 import { sui } from "./types";
-
-const ERROR_CODES = {
-    ERR_UNDERAGE: 1
-}
 
 const MY_ADDRESS = '0xbed1a0d1bb2b8e281d81b838f6c35d7864936f0de3233eb161181ab765e0ea40'
 
@@ -23,12 +20,15 @@ class Asserti {
     }
 
     @Write('User')
-    @Assert('age > 10', ERROR_CODES.ERR_UNDERAGE)
+    @Assert([{must: 'age > 10', code: Assertion.ERR_UNDERAGE}])
     create_user(){}
 
 
     @Write('Announcement')
-    @OnlyFor(MY_ADDRESS)
+    @Assert([
+        {must: Assertion.min('message', 5), code: Assertion.ERR_MESSAGE_TOO_SHORT},
+        {must: Assertion.onlyFor(MY_ADDRESS), code: Assertion.ERR_ONLY_OWNER},
+    ])
     create_announcement(){}
 
 }

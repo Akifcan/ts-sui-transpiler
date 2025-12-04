@@ -161,3 +161,20 @@ export function parseStringArray(arrayString: string): string[] {
 }
 
 export function exec(strings: TemplateStringsArray, ...values: any[]) {}
+
+export const parseAssertions = (argumentString: string) => {
+  const assertions: any[] = []
+
+  // {must: ..., code: ...} pattern'lerini bul
+  const regex = /\{must:\s*([^,]+),\s*code:\s*([^}]+)\}/g
+  let match
+
+  while ((match = regex.exec(argumentString)) !== null) {
+      assertions.push({
+          must: match[1].trim(),
+          code: match[2].trim()
+      })
+  }
+
+  return assertions
+}

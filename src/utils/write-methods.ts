@@ -13,5 +13,5 @@ export const handleWriteMethods = (methods: any, writeValues: any) => {
     })
     .join("\n\n");
 
-  return WRITE_METHODS;
+  return {WRITE_METHODS};
 };
