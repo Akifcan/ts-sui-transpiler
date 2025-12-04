@@ -162,18 +162,24 @@ export function parseStringArray(arrayString: string): string[] {
 
 export function exec(strings: TemplateStringsArray, ...values: any[]) {}
 
-export const parseAssertions = (argumentString: string) => {
-  const assertions: any[] = []
+export interface ParsedAssertion {
+  must: string
+  code: string
+}
+
+export const parseAssertions = (argumentString: string): ParsedAssertion[] => {
+  const assertions: ParsedAssertion[] = []
 
   // {must: ..., code: ...} pattern'lerini bul
-  const regex = /\{must:\s*([^,]+),\s*code:\s*([^}]+)\}/g
+  // Parantez içindeki virgülleri de yakala (örn: Assertion.min('message', 5))
+  const regex = /\{must:\s*((?:[^,{}]+|\([^)]*\))+),\s*code:\s*([^}]+)\}/g
   let match
 
   while ((match = regex.exec(argumentString)) !== null) {
-      assertions.push({
-          must: match[1].trim(),
-          code: match[2].trim()
-      })
+    assertions.push({
+      must: match[1].trim(),
+      code: match[2].trim()
+    })
   }
 
   return assertions
