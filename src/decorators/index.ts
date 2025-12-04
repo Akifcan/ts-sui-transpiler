@@ -9,6 +9,20 @@ function Has(has: HasProps[]) {
     }
 }
 
+function OnlyFor(address: string) {
+    return function(target: any) {
+        Reflect.defineMetadata('module:onlyFor', { address }, target);
+        return target;
+    }
+}
+
+function Assert(condition: string, errorCode: number) {
+    return function(target: any) {
+        Reflect.defineMetadata('module:assert', { condition, errorCode }, target);
+        return target;
+    }
+}
+
 function Vector(struct: string) {
     return function(target: any) {
         Reflect.defineMetadata('module:vector',{struct}, target);
@@ -70,4 +84,6 @@ export {
     Vector,
     Push,
     Transfer,
+    Assert,
+    OnlyFor
 }
