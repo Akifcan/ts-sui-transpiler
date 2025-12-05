@@ -25,6 +25,14 @@ export const handleAsserts = (asserts: any, constants: Record<string, string> = 
             const varName = must.match(varReg)!;
             return `assert!(string::length(&${varName[1]}) >= ${num[1]}, ${variable});`
         }
+        if(must.startsWith('Assertion.max(')){
+            const numReg = /Assertion\.max\([^,]+,\s*(\d+)\)/
+            const num = must.match(numReg)!;
+
+            const varReg = /Assertion\.max\(\s*'([^']+)'\s*,\s*(\d+)\s*\)/;
+            const varName = must.match(varReg)!;
+            return `assert!(string::length(&${varName[1]}) <= ${num[1]}, ${variable});`
+        }
         if(must.startsWith('Assertion.onlyFor(')){
             const addrReg = /Assertion\.onlyFor\(([^)]+)\)/
             const addrMatch = must.match(addrReg)
