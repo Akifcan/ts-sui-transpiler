@@ -21,8 +21,8 @@ export async function compile(filePath: string): Promise<void> {
     );
     const packageName = classesJSON[0].name?.toLowerCase();
     
-    const {BALANCE_METHODS, USE: BALANCE_USES} = handleContractBalance(classesJSON[0].properties)
-    const ERROR_CODES = handleErrorCodes(classesJSON[0].methods)
+    const {BALANCE_METHODS, USE: BALANCE_USES} = handleContractBalance(classesJSON[0].properties, constants)
+    const ERROR_CODES = handleErrorCodes(classesJSON[0].methods, classesJSON[0].properties)
     const { 
       STRUCTS, 
       USE: STRUCT_USES,

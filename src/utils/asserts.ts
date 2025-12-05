@@ -1,6 +1,22 @@
 import { parseAssertions } from "."
 
-const getAssertValues = (asserts: any) => {
+const suiToMist = (sui: number): string => {
+    const mist = sui * 1_000_000_000
+    return mist.toLocaleString('en-US').replace(/,/g, '_')
+}
+
+export const getVarsandValues = (reg: RegExp, cond: any) => {
+    const numStr = cond.must.match(reg)?.[1]
+    const num = suiToMist(parseInt(numStr))
+    const variable = cond.code.split('.')[1]
+
+    return {
+        num,
+        variable
+    }
+}
+
+export const getAssertValues = (asserts: any) => {
     if (!asserts || !asserts.arguments) {
       return []
     }
@@ -12,7 +28,7 @@ const getAssertValues = (asserts: any) => {
     return parsedAssertions
 }
 
-export const handleAsserts = (asserts: any, constants: Record<string, string> = {}) => {
+export const handleAsserts = (asserts: any, constants: Record<string, string>, useArray?: boolean) => {
     const parsedAsserts = getAssertValues(asserts)
     const result = parsedAsserts.map((x: {must: string, code: string}) => {
         const { must, code } = x
@@ -47,6 +63,6 @@ export const handleAsserts = (asserts: any, constants: Record<string, string> = 
             return `assert!(tx_context::sender(ctx) == @${address}, ${variable});`
         }
         return `assert!(${must.replace(/'/g, "")}, ${variable});`
-    }).join('\n')
-    return result
+    })
+    return !useArray ? result.join('\n') : result
 }

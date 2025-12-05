@@ -1,6 +1,8 @@
 import { parseStringArray } from ".";
+import chalk from "chalk";
+import { getAssertValues, getVarsandValues } from "./asserts";
 
-export const handleContractBalance = (properties: any,) => {
+export const handleContractBalance = (properties: any, constants: Record<string, string> = {}) => {
     const balances = properties.filter((x: any) =>
       x.decorators.find((y: any) => y.name === "Balance")
     );
@@ -8,23 +10,84 @@ export const handleContractBalance = (properties: any,) => {
     const BALANCE_METHODS = balances.map((method: any) => {
         const functions = parseStringArray(method.defaultValue)
         const variableName = method.name
-        const balanceVariable = `${variableName}Balance` 
+        const balanceVariable = `${variableName}Balance`
+
+        const asserts = method.decorators.find((x: any) => x.name === 'Assert')
+        const conditions = getAssertValues(asserts)
+        
+        if (!/^[A-Z]/.test(balanceVariable)) {
+            console.log(chalk.red.bold(`Error: Balance struct "${balanceVariable}" should start with an uppercase letter (A-Z)`))
+            process.exit(1)
+        } 
 
         let depositFn = ''
         let getBalanceFn  = ''
         let widthDrawFn = ''
 
         if(functions.find((x) => x === 'deposit')){
+
+            let minDepositAssert = ''
+            let maxDepositAssert = ''
+
+            const minDepositCondition = conditions.find((x: any) => x.must.startsWith('Assertion.minDeposit('))
+            const maxDepositCondition = conditions.find((x: any) => x.must.startsWith('Assertion.maxDeposit('))
+            
+            if(minDepositCondition){
+                const { num, variable } = getVarsandValues(/Assertion\.minDeposit\((\d+)\)/, minDepositCondition)
+
+                minDepositAssert = `
+                    let amount = balance::value(&incoming);
+                    assert!(amount >= ${num}, ${variable});
+                `
+            }
+
+            if(maxDepositCondition){
+                const { num, variable } = getVarsandValues(/Assertion\.maxDeposit\((\d+)\)/, maxDepositCondition)
+
+                maxDepositAssert = `
+                    let amount = balance::value(&incoming);
+                    assert!(amount <= ${num}, ${variable});
+                `
+            }
+
             depositFn = `public fun deposit_${balanceVariable}(balance_obj: &mut ${balanceVariable}, coins: Coin<SUI>) {
                 let incoming = coin::into_balance(coins);
+                ${minDepositAssert}
+                ${maxDepositAssert}
                 balance::join(&mut balance_obj.total, incoming);
             }`
         }
 
         if(functions.find((x) => x === 'withdraw')){
+
+            let minWithdrawAssert = ''
+            let maxWithdrawAssert = ''
+
+            const minWithdrawCondition = conditions.find((x: any) => x.must.startsWith('Assertion.minWithdraw('))
+            const maxWithdrawCondition = conditions.find((x: any) => x.must.startsWith('Assertion.maxWithdraw('))
+
+
+            if(minWithdrawCondition){
+                const { num, variable } = getVarsandValues(/Assertion\.minWithdraw\((\d+)\)/, minWithdrawCondition)
+                minWithdrawAssert = `
+                    assert!(amount >= ${num}, ${variable});
+                `
+            }
+
+            if(maxWithdrawCondition){
+                const { num, variable } = getVarsandValues(/Assertion\.maxWithdraw\((\d+)\)/, maxWithdrawCondition)
+
+                maxWithdrawAssert = `
+                    assert!(amount >= ${num}, ${variable});
+                `
+            }
+
+
             widthDrawFn = `public fun withdraw_${balanceVariable}(balance_obj: &mut ${balanceVariable}, amount: u64, ctx: &mut TxContext): Coin<SUI> {
                 let sender = tx_context::sender(ctx);
                 assert!(sender == balance_obj.owner, 0);
+                ${minWithdrawAssert}
+                ${maxWithdrawAssert}
                 let split = balance::split(&mut balance_obj.total, amount);
                 let coin_out = coin::from_balance(split, ctx);
                 coin_out

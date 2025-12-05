@@ -6,11 +6,12 @@ export interface MethodAssertion {
     assertions: ParsedAssertion[]
 }
 
-export const handleErrorCodes = (methods: any): string => {
-    const asserts = methods.filter((x: any) => x.decorators.find((y: any) => y.name === 'Assert'))
-    const errorCodes = new Set<string>()
+export const handleErrorCodes = (methods: any, properties: any): string => {
+    const method = methods.filter((x: any) => x.decorators.find((y: any) => y.name === 'Assert'))
+    const props = properties.filter((x: any) => x.decorators.find((y: any) => y.name === 'Assert'))
+    const errorCodes = new Set<string>();
 
-    asserts.forEach((assert: any) => {
+    ([...method, ...props] as any).forEach((assert: any) => {
         const decorator = assert.decorators.find((x: any) => x.name === 'Assert')
         const argumentString = decorator.arguments[0]
         const parsed = parseAssertions(argumentString) as any
