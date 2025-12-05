@@ -45,7 +45,7 @@ export const handleContractBalance = (properties: any, constants: Record<string,
                 const { num, variable } = getVarsandValues(/Assertion\.maxDeposit\((\d+)\)/, maxDepositCondition)
 
                 maxDepositAssert = `
-                    let amount = balance::value(&incoming);
+                    ${!minDepositCondition ? 'let amount = balance::value(&incoming);' : ''}
                     assert!(amount <= ${num}, ${variable});
                 `
             }
