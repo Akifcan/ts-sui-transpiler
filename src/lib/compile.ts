@@ -35,7 +35,7 @@ export async function compile(filePath: string): Promise<void> {
       constants
     );
     const VECTOR_METHODS = handleVectorMethods(classesJSON[0].methods, vectorValues)
-    const {NFT_METHODS, USE: NFT_USES, INIT: NFT_INITS} = handleNftMethods(classesJSON[0].methods, writeValues)
+    const {NFT_METHODS, USE: NFT_USES, INIT: NFT_INITS} = handleNftMethods(classesJSON[0].methods, writeValues, constants)
     const EXEC_METHODS = handleExecMethods(classesJSON[0].methods, constants)
     const INITS = NFT_INITS ? `
       fun init(otw: ${packageName?.toUpperCase()}, ctx: &mut TxContext) {
